@@ -1,0 +1,314 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Package Version="3">
+    <PathDelim Value="\"/>
+    <Name Value="NewAC"/>
+    <CompilerOptions>
+      <Version Value="8"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Other>
+        <CompilerPath Value="$(CompPath)"/>
+      </Other>
+    </CompilerOptions>
+    <Files Count="70">
+      <Item1>
+        <Filename Value="ACS_Classes.pas"/>
+        <UnitName Value="ACS_Classes"/>
+      </Item1>
+      <Item2>
+        <Filename Value="ACS_Wave.pas"/>
+        <UnitName Value="ACS_Wave"/>
+      </Item2>
+      <Item3>
+        <Filename Value="ACS_Vorbis.pas"/>
+        <UnitName Value="ACS_Vorbis"/>
+      </Item3>
+      <Item4>
+        <Filename Value="ACS_Misc.pas"/>
+        <UnitName Value="ACS_Misc"/>
+      </Item4>
+      <Item5>
+        <Filename Value="ACS_Converters.pas"/>
+        <UnitName Value="ACS_Converters"/>
+      </Item5>
+      <Item6>
+        <Filename Value="ACS_Filters.pas"/>
+        <UnitName Value="ACS_Filters"/>
+      </Item6>
+      <Item7>
+        <Filename Value="acs_reg.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="acs_reg"/>
+      </Item7>
+      <Item8>
+        <Filename Value="ACS_AudioMix.pas"/>
+        <UnitName Value="ACS_AudioMix"/>
+      </Item8>
+      <Item9>
+        <Filename Value="VorbisFile.pas"/>
+        <UnitName Value="VorbisFile"/>
+      </Item9>
+      <Item10>
+        <Filename Value="VorbisEnc.pas"/>
+        <UnitName Value="VorbisEnc"/>
+      </Item10>
+      <Item11>
+        <Filename Value="Codec.pas"/>
+        <UnitName Value="Codec"/>
+      </Item11>
+      <Item12>
+        <Filename Value="_CDRip.pas"/>
+        <UnitName Value="_CDRip"/>
+      </Item12>
+      <Item13>
+        <Filename Value="ACS_CDROM.pas"/>
+        <UnitName Value="ACS_CDROM"/>
+      </Item13>
+      <Item14>
+        <Filename Value="ACS_LAME.pas"/>
+        <UnitName Value="ACS_LAME"/>
+      </Item14>
+      <Item15>
+        <Filename Value="lame.pas"/>
+        <UnitName Value="lame"/>
+      </Item15>
+      <Item16>
+        <Filename Value="ACS_Streams.pas"/>
+        <UnitName Value="ACS_Streams"/>
+      </Item16>
+      <Item17>
+        <Filename Value="_MSAcm.pas"/>
+        <UnitName Value="_MSAcm"/>
+      </Item17>
+      <Item18>
+        <Filename Value="waveconverter.pas"/>
+        <UnitName Value="waveconverter"/>
+      </Item18>
+      <Item19>
+        <Filename Value="MACDll.pas"/>
+        <UnitName Value="MACDll"/>
+      </Item19>
+      <Item20>
+        <Filename Value="ACS_MAC.pas"/>
+        <UnitName Value="ACS_MAC"/>
+      </Item20>
+      <Item21>
+        <Filename Value="ACS_Procs.pas"/>
+        <UnitName Value="ACS_Procs"/>
+      </Item21>
+      <Item22>
+        <Filename Value="ACS_Types.pas"/>
+        <UnitName Value="ACS_Types"/>
+      </Item22>
+      <Item23>
+        <Filename Value="FLAC.pas"/>
+        <UnitName Value="FLAC"/>
+      </Item23>
+      <Item24>
+        <Filename Value="ACS_DXAudio.pas"/>
+        <UnitName Value="ACS_DXAudio"/>
+      </Item24>
+      <Item25>
+        <Filename Value="ACS_FLAC.pas"/>
+        <UnitName Value="ACS_FLAC"/>
+      </Item25>
+      <Item26>
+        <Filename Value="ACS_smpeg.pas"/>
+        <UnitName Value="ACS_smpeg"/>
+      </Item26>
+      <Item27>
+        <Filename Value="DSWrapper.pas"/>
+        <UnitName Value="DSWrapper"/>
+      </Item27>
+      <Item28>
+        <Filename Value="_DirectSound.pas"/>
+        <UnitName Value="_DirectSound"/>
+      </Item28>
+      <Item29>
+        <Filename Value="libsamplerate.pas"/>
+        <UnitName Value="libsamplerate"/>
+      </Item29>
+      <Item30>
+        <Filename Value="AuSampleRate.pas"/>
+        <UnitName Value="AuSampleRate"/>
+      </Item30>
+      <Item31>
+        <Filename Value="WavPackDLL.pas"/>
+        <UnitName Value="WavPackDLL"/>
+      </Item31>
+      <Item32>
+        <Filename Value="ACS_Tags.pas"/>
+        <UnitName Value="ACS_Tags"/>
+      </Item32>
+      <Item33>
+        <Filename Value="ACS_WavPack.pas"/>
+        <UnitName Value="ACS_WavPack"/>
+      </Item33>
+      <Item34>
+        <Filename Value="_DXTypes.pas"/>
+        <UnitName Value="_DXTypes"/>
+      </Item34>
+      <Item35>
+        <Filename Value="ACS_WinMedia.pas"/>
+        <UnitName Value="ACS_WinMedia"/>
+      </Item35>
+      <Item36>
+        <Filename Value="libwma1.pas"/>
+        <UnitName Value="libwma1"/>
+      </Item36>
+      <Item37>
+        <Filename Value="wmfintf.pas"/>
+        <UnitName Value="wmfintf"/>
+      </Item37>
+      <Item38>
+        <Filename Value="ACS_TTA.pas"/>
+        <UnitName Value="ACS_TTA"/>
+      </Item38>
+      <Item39>
+        <Filename Value="TTALib.pas"/>
+        <UnitName Value="TTALib"/>
+      </Item39>
+      <Item40>
+        <Filename Value="AudioPass.pas"/>
+        <UnitName Value="AudioPass"/>
+      </Item40>
+      <Item41>
+        <Filename Value="ACS_OptimFROG.pas"/>
+        <UnitName Value="ACS_OptimFROG"/>
+      </Item41>
+      <Item42>
+        <Filename Value="OptimFROGDLL.pas"/>
+        <UnitName Value="OptimFROGDLL"/>
+      </Item42>
+      <Item43>
+        <Filename Value="libmpdec.pas"/>
+        <UnitName Value="libmpdec"/>
+      </Item43>
+      <Item44>
+        <Filename Value="ACS_MPC.pas"/>
+        <UnitName Value="ACS_MPC"/>
+      </Item44>
+      <Item45>
+        <Filename Value="ACS_TAK.pas"/>
+        <UnitName Value="ACS_TAK"/>
+      </Item45>
+      <Item46>
+        <Filename Value="tak_decoder.pas"/>
+        <UnitName Value="tak_decoder"/>
+      </Item46>
+      <Item47>
+        <Filename Value="libmppenc.pas"/>
+        <UnitName Value="libmppenc"/>
+      </Item47>
+      <Item48>
+        <Filename Value="AudioDMO.pas"/>
+        <UnitName Value="AudioDMO"/>
+      </Item48>
+      <Item49>
+        <Filename Value="_Direct3D9.pas"/>
+        <UnitName Value="_Direct3D9"/>
+      </Item49>
+      <Item50>
+        <Filename Value="_DirectShow9.pas"/>
+        <UnitName Value="_DirectShow9"/>
+      </Item50>
+      <Item51>
+        <Filename Value="msdmo.pas"/>
+        <UnitName Value="msdmo"/>
+      </Item51>
+      <Item52>
+        <Filename Value="NewAC_AVI.pas"/>
+        <UnitName Value="NewAC_AVI"/>
+      </Item52>
+      <Item53>
+        <Filename Value="fftreal.pas"/>
+        <UnitName Value="fftreal"/>
+      </Item53>
+      <Item54>
+        <Filename Value="NewAC_DSP.pas"/>
+        <UnitName Value="NewAC_DSP"/>
+      </Item54>
+      <Item55>
+        <Filename Value="AuASIO.pas"/>
+        <UnitName Value="AuASIO"/>
+      </Item55>
+      <Item56>
+        <Filename Value="OpenASIO.pas"/>
+        <UnitName Value="OpenASIO"/>
+      </Item56>
+      <Item57>
+        <Filename Value="ASIO.pas"/>
+        <UnitName Value="ASIO"/>
+      </Item57>
+      <Item58>
+        <Filename Value="AsioList.pas"/>
+        <UnitName Value="AsioList"/>
+      </Item58>
+      <Item59>
+        <Filename Value="mr_cddb.pas"/>
+        <UnitName Value="mr_cddb"/>
+      </Item59>
+      <Item60>
+        <Filename Value="AuSynch.pas"/>
+        <UnitName Value="AuSynch"/>
+      </Item60>
+      <Item61>
+        <Filename Value="libdca.pas"/>
+        <UnitName Value="libdca"/>
+      </Item61>
+      <Item62>
+        <Filename Value="NewACDTS.pas"/>
+        <UnitName Value="NewACDTS"/>
+      </Item62>
+      <Item63>
+        <Filename Value="NewACAC3.pas"/>
+        <UnitName Value="NewACAC3"/>
+      </Item63>
+      <Item64>
+        <Filename Value="DMXStreams.pas"/>
+        <UnitName Value="DMXStreams"/>
+      </Item64>
+      <Item65>
+        <Filename Value="GainAnalysis.pas"/>
+        <UnitName Value="GainAnalysis"/>
+      </Item65>
+      <Item66>
+        <Filename Value="liba52.pas"/>
+        <UnitName Value="liba52"/>
+      </Item66>
+      <Item67>
+        <Filename Value="NewACIndicators.pas"/>
+        <UnitName Value="NewACIndicators"/>
+      </Item67>
+      <Item68>
+        <Filename Value="mpg123_.pas"/>
+        <UnitName Value="mpg123_"/>
+      </Item68>
+      <Item69>
+        <Filename Value="taglib.pas"/>
+        <UnitName Value="taglib"/>
+      </Item69>
+      <Item70>
+        <Filename Value="ogg1.pas"/>
+        <UnitName Value="ogg1"/>
+      </Item70>
+    </Files>
+    <Type Value="RunAndDesignTime"/>
+    <RequiredPkgs Count="1">
+      <Item1>
+        <PackageName Value="LCL"/>
+        <MinVersion Major="1" Valid="True"/>
+      </Item1>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IgnoreBinaries Value="False"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

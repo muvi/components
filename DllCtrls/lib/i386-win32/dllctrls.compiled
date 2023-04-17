@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Compiler Value="P:\lazarus0928\fpc\2.2.4\bin\i386-win32\fpc.exe" Date="995709674"/>
+  <Params Value=" -MObjFPC -Scgi -O1 -gl -vewnhi -l -FuP:\lazarus0928\lcl\units\i386-win32\ -FuP:\lazarus0928\lcl\units\i386-win32\win32\ -FuP:\lazarus0928\packager\units\i386-win32\ -FuD:\Eigene_Programme\Komponenten\DllCtrls\ -Fu. -FUD:\Eigene_Programme\Komponenten\DllCtrls\lib\i386-win32\ -dLCL -dLCLwin32 dllctrls.pas"/>
+</CONFIG>

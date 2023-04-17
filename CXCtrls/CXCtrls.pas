@@ -1,0 +1,578 @@
+unit CXCtrls;
+
+interface
+
+uses
+  {ShellApi,} Controls, Classes, {Windows,} {Messages,} SysUtils, Forms, Menus,
+  Graphics, {ImgList,} {Consts,} Buttons, StdCtrls, ExtCtrls;
+
+//const WM_TRAYICON = WM_USER+20;
+
+type
+  {ETrayException  = class (Exception)
+    constructor Create(const Msg: string);
+  end;}
+
+  {TTrayIcon2      = class (TComponent)
+  private
+    FTaskBarNewReg    : DWORD;
+    FIconData         : TNotifyIconData;
+    FLMenu            : TPopupMenu;
+    FRMenu            : TPopupMenu;
+    FIcon             : TIcon;
+    FOnMouseDown      : TMouseEvent;
+    FOnMouseUp        : TMouseEvent;
+    FImages           : TImageList;
+    FImageIndex       : TImageIndex;
+    FAnimationCount   : Integer;
+    FAnimationInterval: Integer;
+    FAnimate          : Boolean;
+    FAniPos           : Integer;
+    FVisible          : Boolean;
+    function GetHint: string;
+    procedure SetHint(Value: string);
+    function GetIcon: TIcon;
+    procedure SetIcon(Value: TIcon);
+    function GetIconHandle: Cardinal;
+    procedure SetIconHandle(Value: Cardinal);
+    procedure SetImages(Value: TImageList);
+    procedure SetImageIndex(Value: TImageIndex);
+    procedure SetAnimationCount(Value: Integer);
+    procedure SetAnimationInterval(Value: Integer);
+    procedure SetAnimate(Value: Boolean);
+    procedure SetVisible(Value: Boolean);
+  protected
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure WndProc(var Msg: TMessage);
+    procedure SetModification(hIcon: Cardinal; AHint: string);
+    procedure AnimateOnce;
+    procedure EndAnimation;
+    property Icon: TIcon read GetIcon write SetIcon;
+    property IconHandle: Cardinal read GetIconHandle write SetIconHandle;
+  published
+    property Animate: Boolean read FAnimate write SetAnimate default false;
+    property AnimationCount: Integer read FAnimationCount write SetAnimationCount default 0;
+    property AnimationInterval: Integer read FAnimationInterval write SetAnimationInterval default 40;
+    property Hint: string read GetHint write SetHint;
+    property Images: TImageList read FImages write SetImages;
+    property ImageIndex: TImageIndex read FImageIndex write SetImageIndex default -1;
+    property LMenu: TPopupMenu read FLMenu write FLMenu;
+    property RMenu: TPopupMenu read FRMenu write FRMenu;
+    property Visible: Boolean read FVisible write SetVisible default true;
+
+    property OnMouseDown: TMouseEvent read FOnMouseDown write FOnMouseDown;
+    property OnMouseUp: TMouseEvent read FOnMouseUp write FOnMouseUp;
+  end;}
+
+  TIntegerProc    = procedure (Index: Integer) of object;
+  TControlEvent   = procedure (Sender: TObject; NControl: TControl; Index: Integer) of object;
+  TSControlAnchors= (caVertical,caHorizontal,caNone);
+  TControlType    = (ctEdit,ctLabel,ctButton,ctCheckBox,ctRadio,ctComboBox,ctImage,ctCustom);
+
+  TControlSet     = class (TScrollingWinControl)
+  private
+    FSubCtrlCount: Integer;
+    FControlClass: TControlClass;
+    FSubControls : array of TControl;
+    FMode        : TSControlAnchors;
+    FOnAddControl: TControlEvent;
+    FOnDelControl: TControlEvent;
+    FOnSetCtrlPos: TIntegerProc;
+    function GetSubCtrl(Index: Integer): TControl;
+    procedure SetSubCtrl(Index: Integer; Value: TControl);
+    procedure SetControlClass(Value: TControlClass);
+    procedure SetSubCtrlCount(Value: Integer);
+    procedure SetMode(Value: TSControlAnchors);
+    function GetControlType: TControlType;
+    procedure SetControlType(Value: TControlType);
+    procedure Align_caVertical(Index: integer);
+    procedure Align_caHorizontal(Index: integer);
+    procedure Align_caNone(Index: integer);
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure NewCount(ACount: Integer);
+    property SubControls[Index: Integer]: TControl read GetSubCtrl write SetSubCtrl;
+    procedure AddSubControl(AControl: TControl);
+  published
+    property Align;
+    property Anchors;
+    property AutoScroll;
+    property AutoSize;
+    //property BevelEdges;
+    //property BevelInner;
+    //property BevelKind;
+    //property BevelOuter;
+    //property BevelWidth;
+    property BiDiMode;
+    property BorderWidth;
+    property ControlClass: TControlClass read FControlClass write SetControlClass;
+    property ControlType: TControlType read GetControlType write SetControlType default ctEdit;
+    //property Ctl3D;
+    property Cursor;
+    property Hint;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property SubControlCount: Integer read FSubCtrlCount write SetSubCtrlCount;
+    property TabOrder;
+    property TabStop;
+    property Mode: TSControlAnchors read FMode write SetMode default caVertical;
+    property OnAddControl: TControlEvent read FOnAddControl write FOnAddControl;
+    //property OnAlignInsertBefore;
+    //property OnAlignPosition;
+    //property OnCanResize;
+    property OnClick;
+    property OnConstrainedResize;
+    property OnContextPopup;
+    property OnDblClick;
+    property OnDelControl: TControlEvent read FOnDelControl write FOnDelControl;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    //property OnMouseActivate;
+    property onMouseDown;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnMouseWheelDown;
+    property onMouseWheelUp;
+    property OnResize;
+  end;
+
+procedure Register;
+
+implementation
+
+{TTrayIcon}
+
+{constructor TTrayIcon2.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FAnimate:=false;
+  FAnimationCount:=0;
+  FAnimationInterval:=40;
+  FImageIndex:=-1;
+  //FTaskBarNewReg:=RegisterWindowMessage('TaskbarCreated');
+  //FIconData.Wnd:=AllocateHWND(WndProc);
+  FIconData.cbSize:=SizeOf(FIconData);
+  FIconData.uID:=100;
+  FIconData.uFlags:=NIF_MESSAGE+NIF_ICON+NIF_TIP;
+  FIconData.uCallBackMessage:=WM_TRAYICON;
+  FIconData.hIcon:=Application.Icon.Handle;
+  FIconData.szTip:='';
+  FVisible:=true;
+  Shell_NotifyIcon(NIM_ADD, @FIconData);
+end;
+
+destructor TTrayIcon2.Destroy;
+begin
+  if FVisible then Shell_NotifyIcon(NIM_DELETE, @FIconData);
+  DeallocateHWND(FIconData.Wnd);
+  if FIcon<>nil then begin
+    FIcon.Free;
+    FIcon:=nil;
+  end;
+  inherited Destroy;
+end;
+
+procedure TTrayIcon2.WndProc(var Msg: TMessage);
+var
+  TempPoint: TPoint;
+  I        : Integer;
+begin
+  case Msg.Msg of
+    WM_TRAYICON   : begin
+        case Msg.lParam of
+          WM_LBUTTONDOWN: begin
+              if Assigned(FOnMouseDown) then FOnMouseDown(Self,mbLeft,[ssLeft],0,0);
+              if FLMenu<>nil then begin
+                GetCursorPos(TempPoint);
+                FLMenu.Popup(TempPoint.X,TempPoint.Y);
+              end;
+            end;
+          WM_MBUTTONDOWN  : if Assigned(FOnMouseDown) then FOnMouseDown(Self,mbMiddle,[ssMiddle],0,0);
+          WM_RBUTTONDOWN  : begin
+              if Assigned(FOnMouseDown) then FOnMouseDown(Self,mbRight,[ssRight],0,0);
+              if FRMenu<>nil then begin
+                GetCursorPos(TempPoint);
+                FRMenu.Popup(TempPoint.X,TempPoint.Y);
+              end;
+            end;
+          WM_LBUTTONUP    : if Assigned(FOnMouseDown) then FOnMouseUp(Self,mbLeft,[ssLeft],0,0);
+          WM_MBUTTONUP    : if Assigned(FOnMouseDown) then FOnMouseUp(Self,mbMiddle,[ssMiddle],0,0);
+          WM_RBUTTONUP    : if Assigned(FOnMouseDown) then FOnMouseUp(Self,mbRight,[ssRight],0,0);
+          WM_LBUTTONDBLCLK: begin
+              if Assigned(FOnMouseDown) then FOnMouseDown(Self,mbLeft,[ssLeft,ssDouble],0,0);
+              if LMenu<>nil then begin
+                for I:=0 to LMenu.Items.Count-1 do if LMenu.Items[I].Default then begin
+                  LMenu.Items[I].Click;
+                  break;
+                end;
+              end;
+            end;
+          WM_MBUTTONDBLCLK: if Assigned(FOnMouseDown) then FOnMouseDown(Self,mbMiddle,[ssMiddle,ssDouble],0,0);
+          WM_RBUTTONDBLCLK: begin
+              if Assigned(FOnMouseDown) then FOnMouseDown(Self,mbRight,[ssRight,ssDouble],0,0);
+              if RMenu<>nil then begin
+                for I:=0 to RMenu.Items.Count-1 do if RMenu.Items[I].Default then begin
+                  RMenu.Items[I].Click;
+                  break;
+                end;
+              end;
+            end;
+        end;
+      end;
+    WM_TIMER      : if FImages<>nil then begin
+        Inc(FAniPos);
+        if FAniPos>=FAnimationCount then begin
+          FAniPos:=0;
+          if not Animate then KillTimer(FIconData.Wnd,1);
+        end;
+        if FIcon<>nil then FIcon.Free;
+        FIcon:=TIcon.Create;
+        FImages.GetIcon(FImageIndex+FAniPos,FIcon);
+        FIconData.hIcon:=FIcon.Handle;
+        if FVisible then Shell_NotifyIcon(NIM_MODIFY, @FIconData)
+      end;
+  else
+    if Msg.Msg = FTaskBarNewReg then Shell_NotifyIcon(NIM_ADD,@FIconData);
+  end;
+  inherited;
+end;
+
+procedure TTrayIcon2.SetModification(hIcon: Cardinal; AHint: string);
+var I,Count: Integer;
+begin
+  FIconData.hIcon:=hIcon;
+  if FIcon<>nil then begin
+    FIcon.Free;
+    FIcon:=nil;
+  end;
+  FImageIndex:=-1;
+  Count:=Length(AHint)-1;
+  if Count>63 then Count:=63;
+  FIconData.szTip:='';
+  for I:=0 to Count do FIconData.szTip[I]:=AHint[I+1];
+  if FVisible then Shell_NotifyIcon(NIM_MODIFY,@FIconData);
+end;
+
+function TTrayIcon2.GetIconHandle: Cardinal;
+begin
+  Result:=FIconData.hIcon;
+end;
+
+procedure TTrayIcon2.SetIconHandle(Value: Cardinal);
+begin
+  FIconData.hIcon:=Value;
+  if FIcon<>nil then begin
+    FIcon.Free;
+    FIcon:=nil;
+  end;
+  FImageIndex:=-1;
+  if FVisible then Shell_NotifyIcon(NIM_MODIFY,@FIconData);
+end;
+
+procedure TTrayIcon.AnimateOnce;
+begin
+  if SetTimer(FIconData.Wnd,1,FAnimationInterval,nil)=0
+    then raise EOutOfResources.Create(SNoTimers);
+end;
+
+procedure TTrayIcon2.EndAnimation;
+begin
+  FAnimate:=false;
+end;
+
+function TTrayIcon2.GetIcon: TIcon;
+begin
+    Result:=TIcon.Create;
+    Result.Handle:=FIconData.hIcon;
+end;
+
+procedure TTrayIcon2.SetIcon(Value: TIcon);
+begin
+  FIconData.hIcon:=Value.Handle;
+  if FIcon<>nil then begin
+    FIcon.Free;
+    FIcon:=nil;
+  end;
+  FImageIndex:=-1;
+  if FVisible then Shell_NotifyIcon(NIM_MODIFY,@FIconData);
+end;
+
+procedure TTrayIcon2.SetImages(Value: TImageList);
+begin
+  FImages:=Value;
+  SetImageIndex(FImageIndex);
+end;
+
+procedure TTrayIcon2.SetImageIndex(Value: TImageIndex);
+begin
+  if FIcon<>nil then FIcon.Free;
+  if Images=nil then begin
+    FIconData.hIcon:=Application.Icon.Handle;
+    FImageIndex:=Value;
+  end else begin
+    if (Value>=0) and (Value<FImages.Count) then begin
+      FIcon:=TIcon.Create;
+      FImages.GetIcon(Value,FIcon);
+      FIconData.hIcon:=FIcon.Handle;
+      FImageIndex:=Value;
+    end else begin
+      if FAnimate then begin
+        FAnimate:=false;
+        KillTimer(FIconData.Wnd,1);
+      end;
+      FImageIndex:=-1;
+      FIconData.hIcon:=Application.Icon.Handle;
+    end;
+  end;
+  if FVisible then Shell_NotifyIcon(NIM_MODIFY,@FIconData);
+  SetAnimationCount(FAnimationCount);
+  FAniPos:=0;
+end;
+
+function TTrayIcon2.GetHint: string;
+begin
+  Result:=FIconData.szTip;
+end;
+
+procedure TTrayIcon2.SetHint(Value: string);
+var I,Count: Integer;
+begin
+  Count:=Length(Value)-1;
+  if Count>63 then Count:=63;
+  FIconData.szTip:='';
+  for I:=0 to Count do FIconData.szTip[I]:=Value[I+1];
+  if FVisible then Shell_NotifyIcon(NIM_MODIFY,@FIconData);
+end;
+
+procedure TTrayIcon2.SetAnimationCount(Value: Integer);
+begin
+  if FImages=nil then begin
+    FAnimationCount:=Value;
+    exit;
+  end;
+  if Value<0
+    then FAnimationCount:=0
+    else if FImageIndex+Value>FImages.Count
+      then FAnimationCount:=Images.Count-FImageIndex
+      else FAnimationCount:=Value;
+end;
+
+procedure TTrayIcon2.SetAnimationInterval(Value: Integer);
+begin
+  FAnimationInterval:=Value;
+  if Animate then begin
+    KillTimer(FIconData.Wnd,1);
+    if SetTimer(FIconData.Wnd,1,Value,nil)=0
+      then raise EOutOfResources.Create(SNoTimers);
+  end;
+end;
+
+procedure TTrayIcon2.SetAnimate(Value: Boolean);
+begin
+  if FAnimate=Value then exit;
+  FAnimate:=Value;
+  if Animate then begin
+    if SetTimer(FIconData.Wnd,1,FAnimationInterval,nil)=0
+      then raise EOutOfResources.Create(SNoTimers);
+    FAniPos:=0;
+  end else KillTimer(FIconData.Wnd,1);
+end;
+
+procedure TTrayIcon2.SetVisible(Value: Boolean);
+begin
+  if Value=FVisible then exit;
+  if Value
+    then Shell_NotifyIcon(NIM_ADD,@FIconData)
+    else Shell_NotifyIcon(NIM_DELETE,@FIconData);
+  FVisible:=Value;       
+end;}
+
+{ETrayException}
+
+{constructor ETrayException.Create(const Msg: string);
+begin
+  inherited Create(Msg);
+end;}
+
+{TControlSet}
+
+constructor TControlSet.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FSubCtrlCount:=0;
+  FControlClass:=TEdit;
+  FMode:=caVertical;
+  FOnSetCtrlPos:=@Align_caVertical;
+end;
+
+destructor TControlSet.Destroy;
+begin
+  inherited Destroy;
+end;
+
+function TControlSet.GetSubCtrl(Index: Integer): TControl;
+begin
+  if Index<FSubCtrlCount
+    then Result:=FSubControls[Index]
+    else Result:=nil;
+end;
+
+procedure TControlSet.SetSubCtrl(Index: Integer; Value: TControl);
+begin
+  if Index<FSubCtrlCount
+    then FSubControls[Index].Assign(Value);
+end;
+
+procedure TControlSet.SetControlClass(Value: TControlClass);
+var AControlCount: Integer;
+begin
+  AControlCount:=FSubCtrlCount;
+  SetSubCtrlCount(0);
+  FControlClass:=Value;
+  SetSubCtrlCount(AControlCount);
+end;
+
+procedure TControlSet.SetSubCtrlCount(Value: Integer);
+var I: Integer;
+begin
+  for I:=FSubCtrlCount-1 downto Value do begin
+    if Assigned(FOnDelControl) then FOnDelControl(Self,FSubControls[I],I);
+    FSubControls[I].Free;
+  end;
+  SetLength(FSubControls,Value);
+  for I:=FSubCtrlCount to Value-1 do begin
+    FSubControls[I]:=FControlClass.Create(Self);
+    FSubControls[I].Name:='SubControl'+IntToStr(I);
+    Self.InsertControl(FSubControls[I]);
+    if I>0 then FOnSetCtrlPos(I) else begin
+      FSubControls[I].Left:=0;
+      FSubControls[I].Top:=0;
+    end;
+    if Assigned(FOnAddControl) then FOnAddControl(Self,FSubControls[I],I);
+  end;
+  FSubCtrlCount:=Value;
+end;
+
+procedure TControlSet.AddSubControl(AControl: TControl);
+begin
+  SetLength(FSubControls,FSubCtrlCount+1);
+  FSubControls[FSubCtrlCount]:=AControl;
+  FSubControls[FSubCtrlCount].Name:='SubControl'+IntToStr(FSubCtrlCount);
+  Self.InsertControl(AControl);
+  if FSubCtrlCount>0 then FOnSetCtrlPos(FSubCtrlCount) else begin
+    AControl.Left:=0;
+    AControl.Top:=0;
+  end;
+  Inc(FSubCtrlCount);
+  if Assigned(FOnAddControl) then FOnAddControl(Self,AControl,FSubCtrlCount-1);
+end;
+
+procedure TControlSet.NewCount(ACount: Integer);
+var I: Integer;
+begin
+  if FSubCtrlCount>=ACount then begin
+    for I:=FSubCtrlCount-1 downto ACount do begin
+      if Assigned(FOnDelControl) then FOnDelControl(Self,FSubControls[I],I);
+      FSubControls[I].Free;
+    end;
+    for I:=0 to ACount-1 do if Assigned(FOnAddControl) then FOnAddControl(Self,FSubControls[I],I);
+  end;
+  SetLength(FSubControls,ACount);
+  if FSubCtrlCount<ACount then begin
+    for I:=0 to FSubCtrlCount-1 do if Assigned(FOnAddControl) then FOnAddControl(Self,FSubControls[I],I);
+    for I:=FSubCtrlCount to ACount-1 do begin
+      FSubControls[I]:=FControlClass.Create(Self);
+      FSubControls[I].Name:='SubControl'+IntToStr(I);
+      Self.InsertControl(FSubControls[I]);
+      if I>0 then FOnSetCtrlPos(I) else begin
+        FSubControls[I].Left:=0;
+        FSubControls[I].Top:=0;
+      end;
+      if Assigned(FOnAddControl) then FOnAddControl(Self,FSubControls[I],I);
+    end;
+  end;
+  FSubCtrlCount:=ACount;
+end;
+
+procedure TControlSet.SetMode(Value: TSControlAnchors);
+var I: Integer;
+begin
+  if FMode=Value then exit;
+  FMode:=Value;
+  case Value of
+    caVertical  : FOnSetCtrlPos:=@Align_caVertical;
+    caHorizontal: FOnSetCtrlPos:=@Align_caHorizontal;
+    caNone      : FOnSetCtrlPos:=@Align_caNone;
+  end;
+  for I:=1 to FSubCtrlCount-1 do FOnSetCtrlPos(I);
+end;
+
+function TControlSet.GetControlType: TControlType;
+begin
+  if FControlClass=TEdit
+    then Result:=ctEdit
+    else if FControlClass=TLabel
+      then Result:=ctLabel
+      else if FControlClass=TButton
+        then Result:=ctButton
+        else if FControlClass=TCheckBox
+          then Result:=ctCheckBox
+          else if FControlClass=TRadioButton
+            then Result:=ctRadio
+            else if FControlClass=TComboBox
+              then Result:=ctComboBox
+              else if FControlClass=TImage
+                then Result:=ctImage
+                else Result:=ctCustom;
+end;
+
+procedure TControlSet.SetControlType(Value: TControlType);
+begin
+  if Value=ctCustom then exit;
+  case Value of
+    ctEdit    : SetControlClass(TEdit);
+    ctLabel   : SetControlClass(TLabel);
+    ctButton  : SetControlClass(TButton);
+    ctCheckBox: SetControlClass(TCheckBox);
+    ctRadio   : SetControlClass(TRadioButton);
+    ctComboBox: SetControlClass(TComboBox);
+    ctImage   : SetControlClass(TImage);
+  end;
+end;
+
+procedure TControlSet.Align_caVertical(Index: integer);
+begin
+  with FSubControls[Index] do begin
+    Left:=0;
+    Top:=FSubControls[Index-1].Top+FSubControls[Index-1].Height;
+  end;
+end;
+
+procedure TControlSet.Align_caHorizontal(Index: integer);
+begin
+  with FSubControls[Index] do begin
+    Top:=0;
+    Left:=FSubControls[Index-1].Left+FSubControls[Index-1].Width;
+  end;
+end;
+
+procedure TControlSet.Align_caNone(Index: integer);
+begin
+
+end;
+
+{Allgemein}
+
+procedure Register;
+begin
+  RegisterComponents('Erweitert',[TControlSet]);
+end;
+
+end.

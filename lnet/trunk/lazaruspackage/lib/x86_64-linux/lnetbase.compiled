@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="/usr/bin/fpc" Date="1520294800"/>
+  <Params Value=" -MObjFPC -Sgim -CX -Cg -O2 -gs -gl -l -vewibq -vn-h- -Fi/media/Daten/Eigene_Programme/Komponenten/lnet/trunk/lib/sys -Fu/media/Daten/Eigene_Programme/Komponenten/lnet/trunk/lib -Fu/media/Daten/Eigene_Programme/Komponenten/lnet/trunk/lazaruspackage/ -FU/media/Daten/Eigene_Programme/Komponenten/lnet/trunk/lazaruspackage/lib/x86_64-linux/ -dLNET_BASE lnetbase.pas"/>
+</CONFIG>
